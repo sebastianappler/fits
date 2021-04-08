@@ -3,15 +3,56 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 func main() {
 
-	f := "./from/file"
-	t := "./to/file"
+	ex, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	exPath := filepath.Dir(ex)
+	fromPath := exPath + "/from/"
+	toPath := exPath + "/to/"
 
-	fmt.Print(MoveFile(f, t))
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer watcher.Close()
+
+	done := make(chan bool)
+
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				fmt.Println("Event", event)
+
+				if event.Op&fsnotify.Create == fsnotify.Create {
+					err := MoveFile(event.Name, toPath+filepath.Base(event.Name))
+					if err != nil {
+						fmt.Println(err)
+					}
+
+				}
+
+			case err := <-watcher.Errors:
+				log.Fatal(err)
+			}
+		}
+	}()
+
+	if err := watcher.Add(fromPath); err != nil {
+		log.Fatal(err)
+	}
+	<-done
 }
 
 func MoveFile(src, dst string) error {
