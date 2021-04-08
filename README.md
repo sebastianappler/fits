@@ -1,2 +1,2 @@
 # fits
-Fits is a **Fi**le **T**ransfer **S**ervice written in go.
+Fits is a **fi**le **t**ransfer **s**ervice written in go.
