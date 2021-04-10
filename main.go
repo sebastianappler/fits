@@ -5,20 +5,25 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/pelletier/go-toml"
 )
 
 func main() {
 
-	ex, err := os.Executable()
-	if err != nil {
-		log.Fatal(err)
-	}
-	exPath := filepath.Dir(ex)
-	fromPath := exPath + "/from/"
-	toPath := exPath + "/to/"
+	config, _ := toml.Load(`
+	[from]
+	path = "$HOME/fits/from"
+
+	[to]
+	path = "$HOME/fits/to"`)
+
+	fromPath := GetFullPath(config.Get("from.path").(string))
+	toPath := GetFullPath(config.Get("to.path").(string))
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -36,7 +41,9 @@ func main() {
 				fmt.Println("Event", event)
 
 				if event.Op&fsnotify.Create == fsnotify.Create {
-					err := MoveFile(event.Name, toPath+filepath.Base(event.Name))
+					moveFrom := event.Name
+					moveTo := path.Join(toPath, filepath.Base(event.Name))
+					err := MoveFile(moveFrom, moveTo)
 					if err != nil {
 						fmt.Println(err)
 					}
@@ -53,6 +60,21 @@ func main() {
 		log.Fatal(err)
 	}
 	<-done
+}
+
+func GetFullPath(path string) string {
+
+	strArr := strings.Split(path, "/")
+	fullPath := ""
+	for _, str := range strArr {
+		if str[0] == '$' {
+			fullPath = filepath.Join(fullPath, os.Getenv(str[1:]))
+		} else {
+			fullPath = filepath.Join(fullPath, str)
+		}
+	}
+
+	return fullPath
 }
 
 func MoveFile(src, dst string) error {
