@@ -17,14 +17,13 @@ func main() {
 
 	config, _ := toml.Load(`
 	[from]
-	path = "$HOME/fits/from"
+	path = "/home/sebbe/fits/from"
 
 	[to]
 	path = "$HOME/fits/to"`)
 
 	fromPath := GetFullPath(config.Get("from.path").(string))
 	toPath := GetFullPath(config.Get("to.path").(string))
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -63,11 +62,12 @@ func main() {
 }
 
 func GetFullPath(path string) string {
-
 	strArr := strings.Split(path, "/")
 	fullPath := ""
 	for _, str := range strArr {
-		if str[0] == '$' {
+		if str == "" {
+			fullPath = fullPath + "/"
+		} else if str[0] == '$' {
 			fullPath = filepath.Join(fullPath, os.Getenv(str[1:]))
 		} else {
 			fullPath = filepath.Join(fullPath, str)
@@ -77,13 +77,13 @@ func GetFullPath(path string) string {
 	return fullPath
 }
 
-func MoveFile(src, dst string) error {
-	in, err := os.Open(src)
+func MoveFile(from, to string) error {
+	in, err := os.Open(from)
 	if err != nil {
 		return fmt.Errorf("Couldn't open source file: %s", err)
 	}
 
-	out, err := os.Create(dst)
+	out, err := os.Create(to)
 	if err != nil {
 		in.Close()
 		return fmt.Errorf("Couldn't open dest file: %s", err)
@@ -102,17 +102,17 @@ func MoveFile(src, dst string) error {
 		return fmt.Errorf("Sync error: %s", err)
 	}
 
-	si, err := os.Stat(src)
+	si, err := os.Stat(from)
 	if err != nil {
 		return fmt.Errorf("Stat error: %s", err)
 	}
 
-	err = os.Chmod(dst, si.Mode())
+	err = os.Chmod(to, si.Mode())
 	if err != nil {
 		return fmt.Errorf("Chmod error: %s", err)
 	}
 
-	err = os.Remove(src)
+	err = os.Remove(from)
 	if err != nil {
 		return fmt.Errorf("Failed removing original file: %s", err)
 	}
