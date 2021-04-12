@@ -21,12 +21,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Config loaded successfully")
+	fmt.Println("Config loaded successfully.")
 
 	fromPath := GetFullPath(config.Get("from.path").(string))
 	fmt.Printf("Transfering from %#v to ", fromPath)
 	toPath := GetFullPath(config.Get("to.path").(string))
-	fmt.Printf("%#v\n", toPath)
+	fmt.Printf("%#v.\n", toPath)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
