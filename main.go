@@ -15,12 +15,7 @@ import (
 
 func main() {
 
-	config, _ := toml.Load(`
-	[from]
-	path = "/home/sebbe/fits/from"
-
-	[to]
-	path = "$HOME/fits/to"`)
+	config, _ := toml.LoadFile("./config.toml")
 
 	fromPath := GetFullPath(config.Get("from.path").(string))
 	toPath := GetFullPath(config.Get("to.path").(string))
