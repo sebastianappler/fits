@@ -1,9 +1,22 @@
-FROM golang:1.16
+FROM golang:alpine AS builder
 
-WORKDIR /go/src/app
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+WORKDIR /build
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 COPY . .
+RUN go build -o fits .
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+WORKDIR /dist
+RUN cp -r /build/. .
 
-CMD ["fits"]
+FROM scratch
+COPY --from=builder /dist/fits /
+COPY --from=builder /dist/config.toml /
+
+ENTRYPOINT ["/fits"]
