@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-WORKDIR /fits
+WORKDIR /build
 RUN mkdir from
 RUN mkdir to
 
@@ -10,6 +10,6 @@ RUN go build -v -ldflags="-s -w"
 FROM scratch
 ENV FITS_ENVIRONMENT=docker
 
-COPY --from=builder /fits/fits /fits/config.toml fits/from fits/to /
+COPY --from=builder /build/fits /build/config.toml build/from build/to /
 
 ENTRYPOINT ["/fits"]
