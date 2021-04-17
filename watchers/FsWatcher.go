@@ -3,7 +3,12 @@ package watchers
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path"
+	"path/filepath"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 type FsWatcher struct {
@@ -11,7 +16,49 @@ type FsWatcher struct {
 	To string
 }
 
-func MoveFile(from, to string) error {
+func Watch(fromPath string, toPath string) error {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer watcher.Close()
+
+	done := make(chan bool)
+
+	fmt.Printf("Transfering from %#v ", fromPath)
+	fmt.Printf("to %#v.\n", toPath)
+
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				fmt.Println("Event", event)
+
+				if event.Op&fsnotify.Create == fsnotify.Create {
+					moveFrom := event.Name
+					moveTo := path.Join(toPath, filepath.Base(event.Name))
+					err := moveFile(moveFrom, moveTo)
+					if err != nil {
+						fmt.Println(err)
+					}
+				}
+
+			case err := <-watcher.Errors:
+				log.Fatal(err)
+			}
+		}
+	}()
+
+	if err := watcher.Add(fromPath); err != nil {
+		log.Fatal(err)
+	}
+	<-done
+
+	return nil
+}
+
+func moveFile(from, to string) error {
 	in, err := os.Open(from)
 	if err != nil {
 		return fmt.Errorf("Couldn't open source file: %s", err)

@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
+
 	"github.com/sebastianappler/fits/watchers"
-	"github.com/fsnotify/fsnotify"
 	"github.com/pelletier/go-toml"
 )
 
@@ -32,43 +31,10 @@ func main() {
 		toPath = GetFullPath(config.Get("to.path").(string))
 	}
 
-	fmt.Printf("Transfering from %#v ", fromPath)
-	fmt.Printf("to %#v.\n", toPath)
-
-	watcher, err := fsnotify.NewWatcher()
+	err = watchers.Watch(fromPath, toPath)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	defer watcher.Close()
-
-	done := make(chan bool)
-
-	go func() {
-		for {
-			select {
-			case event := <-watcher.Events:
-				fmt.Println("Event", event)
-
-				if event.Op&fsnotify.Create == fsnotify.Create {
-					moveFrom := event.Name
-					moveTo := path.Join(toPath, filepath.Base(event.Name))
-					err := watchers.MoveFile(moveFrom, moveTo)
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-
-			case err := <-watcher.Errors:
-				log.Fatal(err)
-			}
-		}
-	}()
-
-	if err := watcher.Add(fromPath); err != nil {
-		log.Fatal(err)
-	}
-	<-done
 }
 
 func GetFullPath(path string) string {
@@ -86,3 +52,4 @@ func GetFullPath(path string) string {
 
 	return fullPath
 }
+
