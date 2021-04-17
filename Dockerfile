@@ -15,7 +15,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY . .
-RUN go build -o fits .
+RUN go build -v -ldflags="-s -w"
 
 WORKDIR /dist
 RUN cp -r /build/. .
