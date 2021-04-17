@@ -14,20 +14,27 @@ import (
 )
 
 func main() {
-
 	config, err := toml.LoadFile("./config.toml")
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	fmt.Println("Config loaded successfully.")
 
-	fromPath := GetFullPath(config.Get("from.path").(string))
-	fmt.Printf("Transfering from %#v to ", fromPath)
-	toPath := GetFullPath(config.Get("to.path").(string))
-	fmt.Printf("%#v.\n", toPath)
+	fromPath := ""
+	toPath := ""
+	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
 
+	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
+	if fitsEnvironment == "docker" {
+		fromPath = "/from"
+		toPath = "/to"
+	} else {
+		fromPath = GetFullPath(config.Get("from.path").(string))
+		toPath = GetFullPath(config.Get("to.path").(string))
+	}
+
+	fmt.Printf("Transfering from %#v ", fromPath)
+	fmt.Printf("to %#v.\n", toPath)
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -50,7 +57,6 @@ func main() {
 					if err != nil {
 						fmt.Println(err)
 					}
-
 				}
 
 			case err := <-watcher.Errors:
