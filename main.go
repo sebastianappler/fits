@@ -22,10 +22,10 @@ func main() {
 
 	fromPath := ""
 	toPath := ""
+	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
 
-	fmt.Printf("ENVIRONMENT: %#v\n", os.Getenv("FITS_ENVIRONMENT"))
-
-	if os.Getenv("FITS_ENVIRONMENT") == "docker" {
+	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
+	if fitsEnvironment == "docker" {
 		fromPath = "/from"
 		toPath = "/to"
 	} else {
@@ -33,8 +33,8 @@ func main() {
 		toPath = GetFullPath(config.Get("to.path").(string))
 	}
 
-	fmt.Printf("Transfering from %#v to ", fromPath)
-	fmt.Printf("%#v.\n", toPath)
+	fmt.Printf("Transfering from %#v ", fromPath)
+	fmt.Printf("to %#v.\n", toPath)
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
