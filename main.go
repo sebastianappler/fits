@@ -14,13 +14,10 @@ import (
 )
 
 func main() {
-
 	config, err := toml.LoadFile("./config.toml")
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	fmt.Println("Config loaded successfully.")
 
 	fromPath := ""
@@ -60,7 +57,6 @@ func main() {
 					if err != nil {
 						fmt.Println(err)
 					}
-
 				}
 
 			case err := <-watcher.Errors:

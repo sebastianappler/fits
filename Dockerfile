@@ -5,6 +5,10 @@ ENV GO111MODULE=on \
     GOOS=linux \
     GOARCH=amd64
 
+WORKDIR /
+
+RUN mkdir from
+RUN mkdir to
 
 WORKDIR /build
 COPY go.mod .
@@ -13,17 +17,14 @@ RUN go mod download
 COPY . .
 RUN go build -o fits .
 
-RUN mkdir from
-RUN mkdir to
-
 WORKDIR /dist
 RUN cp -r /build/. .
 
 FROM scratch
 COPY --from=builder /dist/fits /
 COPY --from=builder /dist/config.toml /
-COPY --from=builder /dist/from /from
-COPY --from=builder /dist/to /to
+COPY --from=builder /from /from
+COPY --from=builder /to /to
 
 ENV FITS_ENVIRONMENT=docker
 
