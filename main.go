@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
-
+	"github.com/sebastianappler/fits/watchers"
 	"github.com/fsnotify/fsnotify"
 	"github.com/pelletier/go-toml"
 )
@@ -35,6 +34,7 @@ func main() {
 
 	fmt.Printf("Transfering from %#v ", fromPath)
 	fmt.Printf("to %#v.\n", toPath)
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +53,7 @@ func main() {
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					moveFrom := event.Name
 					moveTo := path.Join(toPath, filepath.Base(event.Name))
-					err := MoveFile(moveFrom, moveTo)
+					err := watchers.MoveFile(moveFrom, moveTo)
 					if err != nil {
 						fmt.Println(err)
 					}
@@ -85,47 +85,4 @@ func GetFullPath(path string) string {
 	}
 
 	return fullPath
-}
-
-func MoveFile(from, to string) error {
-	in, err := os.Open(from)
-	if err != nil {
-		return fmt.Errorf("Couldn't open source file: %s", err)
-	}
-
-	out, err := os.Create(to)
-	if err != nil {
-		in.Close()
-		return fmt.Errorf("Couldn't open dest file: %s", err)
-	}
-
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	in.Close()
-	if err != nil {
-		return fmt.Errorf("Writing to output file failed: %s", err)
-	}
-
-	err = out.Sync()
-	if err != nil {
-		return fmt.Errorf("Sync error: %s", err)
-	}
-
-	si, err := os.Stat(from)
-	if err != nil {
-		return fmt.Errorf("Stat error: %s", err)
-	}
-
-	err = os.Chmod(to, si.Mode())
-	if err != nil {
-		return fmt.Errorf("Chmod error: %s", err)
-	}
-
-	err = os.Remove(from)
-	if err != nil {
-		return fmt.Errorf("Failed removing original file: %s", err)
-	}
-
-	return nil
 }
