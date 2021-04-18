@@ -9,11 +9,6 @@ import (
 	"github.com/sebastianappler/fits/senders"
 )
 
-type FsWatcher struct {
-	From string
-	To   string
-}
-
 func FsWatch(fromPath common.Path, toPath common.Path) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
