@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/sebastianappler/fits/watchers"
 	"github.com/pelletier/go-toml"
+	"github.com/sebastianappler/fits/common"
+	"github.com/sebastianappler/fits/watchers"
 )
 
 func main() {
@@ -18,20 +19,42 @@ func main() {
 	}
 	fmt.Println("Config loaded successfully.")
 
-	fromPath := ""
-	toPath := ""
+	fromUrlRaw := ""
+	toUrlRaw := ""
 	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
 
 	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
 	if fitsEnvironment == "docker" {
-		fromPath = "/from"
-		toPath = "/to"
+		fromUrlRaw = "/from"
+		toUrlRaw = "/to"
 	} else {
-		fromPath = GetFullPath(config.Get("from.path").(string))
-		toPath = GetFullPath(config.Get("to.path").(string))
+		fromUrlRaw = GetFullPath(config.Get("from.path").(string))
+		toUrlRaw = GetFullPath(config.Get("to.path").(string))
 	}
 
-	err = watchers.Watch(fromPath, toPath)
+	fromUrl, err := url.Parse(fromUrlRaw)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fromPath := common.Path{
+		Url:      *fromUrl,
+		UrlRaw:   fromUrlRaw,
+		Username: config.GetDefault("from.username", "").(string),
+		Password: config.GetDefault("from.password", "").(string),
+	}
+
+	toUrl, err := url.Parse(toUrlRaw)
+	if err != nil {
+		log.Fatal(err)
+	}
+	toPath := common.Path{
+		Url:      *toUrl,
+		UrlRaw:   toUrlRaw,
+		Username: config.GetDefault("to.username", "").(string),
+		Password: config.GetDefault("to.password", "").(string),
+	}
+
+	err = watchers.FsWatch(fromPath, toPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,14 +65,13 @@ func GetFullPath(path string) string {
 	fullPath := ""
 	for _, str := range strArr {
 		if str == "" {
-			fullPath = fullPath + "/"
+			fullPath += "/"
 		} else if str[0] == '$' {
-			fullPath = filepath.Join(fullPath, os.Getenv(str[1:]))
+			fullPath = fullPath + os.Getenv(str[1:]) + "/"
 		} else {
-			fullPath = filepath.Join(fullPath, str)
+			fullPath = fullPath + str + "/"
 		}
 	}
 
 	return fullPath
 }
-
