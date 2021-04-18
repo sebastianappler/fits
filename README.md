@@ -1,21 +1,22 @@
 # fits
 Fits is a **fi**le **t**ransfer **s**ervice written in go.
 
-## Usage
+# Usage
 When you start fits it will transfer files between your `from` and `to` from your config.
+Make sure to set the paths correctly before running fits. Check the [Config](#config) section how to edit it.
 
-### Go
-You can build the go binary like so:
+## Go
+Build the go binary:
 ```
 go build .
 ```
 
-And run go binary:
+Run fits:
 ```
 ./fits
 ```
 
-### Docker
+## Docker
 
 Build docker image:
 ```
@@ -27,10 +28,10 @@ Run docker image with your `from` and `to` folders:
 docker run -v $HOME/fits/from:/from -v $HOME/fits/to:/to -it fits
 ```
 
-## Config
+# Config
 To use fits put a `from` and `to` destination in your `config.toml`
 
-#### File system
+## File system
 Example File system `config.toml`:
 ```
 [from]
@@ -40,7 +41,7 @@ path = "$HOME/fits/from"
 path = "$HOME/fits/to"
 ```
 
-#### Ftp
+## Ftp
 At the moment you can only set ftp in `to` settings.
 
 Example ftp `config.toml`:
