@@ -12,7 +12,7 @@ import (
 	"github.com/sebastianappler/fits/common"
 )
 
-func FtpSend(fileFullPath string, toPath common.Path) error {
+func FtpSend(fileLocalPath string, toPath common.Path) error {
 
 	ftpBaseUrl := toPath.Url.Hostname() + ":21"
 	fmt.Printf("Connecting to ftp %v...\n", ftpBaseUrl)
@@ -26,8 +26,8 @@ func FtpSend(fileFullPath string, toPath common.Path) error {
 	}
 	fmt.Println("Login success!")
 
-	fmt.Printf("File full path: %v\n", fileFullPath)
-	file, err := os.Open(fileFullPath)
+	fmt.Printf("File full path: %v\n", fileLocalPath)
+	file, err := os.Open(fileLocalPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +36,7 @@ func FtpSend(fileFullPath string, toPath common.Path) error {
 		log.Fatal(err)
 	}
 
-	filename := filepath.Base(fileFullPath)
+	filename := filepath.Base(fileLocalPath)
 	ftpLocation := filepath.Join(toPath.Url.Path, filename)
 	fmt.Printf("FtpLocation: %v\n", ftpLocation)
 
