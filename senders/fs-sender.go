@@ -9,9 +9,9 @@ import (
 	"github.com/sebastianappler/fits/common"
 )
 
-func FsSend(from string, toPath common.Path) error {
-	to := filepath.Join(toPath.UrlRaw, filepath.Base(from))
-	in, err := os.Open(from)
+func FsSend(fileLocalPath string, toPath common.Path) error {
+	to := filepath.Join(toPath.UrlRaw, filepath.Base(fileLocalPath))
+	in, err := os.Open(fileLocalPath)
 	if err != nil {
 		return fmt.Errorf("Couldn't open source file: %s", err)
 	}
@@ -35,7 +35,7 @@ func FsSend(from string, toPath common.Path) error {
 		return fmt.Errorf("Sync error: %s", err)
 	}
 
-	si, err := os.Stat(from)
+	si, err := os.Stat(fileLocalPath)
 	if err != nil {
 		return fmt.Errorf("Stat error: %s", err)
 	}
@@ -45,7 +45,7 @@ func FsSend(from string, toPath common.Path) error {
 		return fmt.Errorf("Chmod error: %s", err)
 	}
 
-	err = os.Remove(from)
+	err = os.Remove(fileLocalPath)
 	if err != nil {
 		return fmt.Errorf("Failed removing original file: %s", err)
 	}
