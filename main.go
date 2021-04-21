@@ -19,23 +19,27 @@ func main() {
 	}
 	fmt.Println("Config loaded successfully.")
 
-	fromUrlRaw := ""
-	toUrlRaw := ""
+	fromUrlRaw := GetFullPath(config.Get("from.path").(string))
+	toUrlRaw := GetFullPath(config.Get("to.path").(string))
 	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
-
-	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
-	if fitsEnvironment == "docker" {
-		fromUrlRaw = "/from"
-		toUrlRaw = "/to"
-	} else {
-		fromUrlRaw = GetFullPath(config.Get("from.path").(string))
-		toUrlRaw = GetFullPath(config.Get("to.path").(string))
-	}
-
 	fromUrl, err := url.Parse(fromUrlRaw)
 	if err != nil {
 		log.Fatal(err)
 	}
+	toUrl, err := url.Parse(toUrlRaw)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
+	if fitsEnvironment == "docker" {
+		fromUrlRaw = "/from"
+
+		if toUrl.Scheme == "" {
+			toUrlRaw = "/to"
+		}
+	}
+
 	fromPath := common.Path{
 		Url:      *fromUrl,
 		UrlRaw:   fromUrlRaw,
@@ -43,10 +47,6 @@ func main() {
 		Password: config.GetDefault("from.password", "").(string),
 	}
 
-	toUrl, err := url.Parse(toUrlRaw)
-	if err != nil {
-		log.Fatal(err)
-	}
 	toPath := common.Path{
 		Url:      *toUrl,
 		UrlRaw:   toUrlRaw,
