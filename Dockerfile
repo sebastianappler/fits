@@ -1,5 +1,7 @@
 FROM golang:alpine AS builder
 
+ENV CGO_ENABLED=0
+
 WORKDIR /build
 RUN mkdir from
 RUN mkdir to
