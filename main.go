@@ -55,6 +55,7 @@ func main() {
 	}
 
 	err = watchers.FsWatch(fromPath, toPath)
+
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,7 +2,9 @@ package watchers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/sebastianappler/fits/common"
@@ -21,6 +23,8 @@ func FsWatch(fromPath common.Path, toPath common.Path) error {
 
 	fmt.Printf("Transfering from %#v ", fromPath.UrlRaw)
 	fmt.Printf("to %#v.\n", toPath.UrlRaw)
+
+	sendAllFiles(fromPath.UrlRaw, toPath)
 
 	go func() {
 		for {
@@ -43,6 +47,22 @@ func FsWatch(fromPath common.Path, toPath common.Path) error {
 		log.Fatal(err)
 	}
 	<-done
+
+	return nil
+}
+
+func sendAllFiles(fromPath string, toPath common.Path) error {
+
+	files, err := ioutil.ReadDir(fromPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		if file.IsDir() != true {
+			senders.Send(filepath.Join(fromPath, file.Name()), toPath)
+		}
+	}
 
 	return nil
 }
