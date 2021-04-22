@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
@@ -34,7 +35,15 @@ func FsWatch(fromPath common.Path, toPath common.Path) error {
 
 				if event.Op&fsnotify.Create == fsnotify.Create {
 					fileLocalPath := event.Name
-					senders.Send(fileLocalPath, toPath)
+
+					fileInfo, err := os.Stat(fileLocalPath)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					if fileInfo.IsDir() != true {
+						senders.Send(fileLocalPath, toPath)
+					}
 				}
 
 			case err := <-watcher.Errors:
