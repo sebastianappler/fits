@@ -48,5 +48,11 @@ func FtpSend(fileLocalPath string, toPath common.Path) error {
 	}
 
 	fmt.Printf("File %v uploaded to ftp!\n", filename)
+
+	err = os.Remove(fileLocalPath)
+	if err != nil {
+		return fmt.Errorf("Failed removing original file: %s", err)
+	}
+
 	return nil
 }
