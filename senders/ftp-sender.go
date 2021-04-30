@@ -14,7 +14,12 @@ import (
 
 func FtpSend(fileLocalPath string, toPath common.Path) error {
 
-	ftpBaseUrl := toPath.Url.Hostname() + ":21"
+	port := toPath.Url.Port()
+	if port == "" {
+		port = "21"
+	}
+
+	ftpBaseUrl := toPath.Url.Host + ":" + port
 	fmt.Printf("Connecting to ftp %v...\n", ftpBaseUrl)
 	c, err := ftp.Connect(ftpBaseUrl)
 	fmt.Println("Connected!")
