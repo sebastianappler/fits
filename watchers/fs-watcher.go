@@ -42,7 +42,17 @@ func FsWatch(fromPath common.Path, toPath common.Path) error {
 					}
 
 					if fileInfo.IsDir() != true {
-						senders.Send(fileLocalPath, toPath)
+						err = senders.Send(fileLocalPath, toPath)
+
+						if err != nil {
+							log.Fatalf("Failed to send file: %v", err)
+						} else {
+							// Remove file when it's sent
+							err = os.Remove(fileLocalPath)
+							if err != nil {
+								log.Fatalf("Failed removing original file: %v", err)
+							}
+						}
 					}
 				}
 

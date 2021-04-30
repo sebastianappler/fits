@@ -45,10 +45,5 @@ func FsSend(fileLocalPath string, toPath common.Path) error {
 		return fmt.Errorf("Chmod error: %s", err)
 	}
 
-	err = os.Remove(fileLocalPath)
-	if err != nil {
-		return fmt.Errorf("Failed removing original file: %s", err)
-	}
-
 	return nil
 }
