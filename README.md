@@ -62,12 +62,12 @@ Supports `[to]`
 
 **Note!**  
 SSH will check `known_hosts` at the running users `$HOME`-folder.
-Please add the host you are sending to in `~/.ssh/known_hosts`
-This can be done with:
+Please add the host you are sending to in `~/.ssh/known_hosts`  
+This can be done with:  
 ```
 ssh-keyscan -H 192.168.1.100 >> ~/.ssh/known_hosts
 ```
-
+  
 
 Example ssh `config.toml`
 ```
