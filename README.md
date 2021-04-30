@@ -32,6 +32,8 @@ docker run -v $HOME/fits/from:/from -v $HOME/fits/to:/to -it fits
 To use fits put a `from` and `to` destination in your `config.toml`
 
 ### File system
+Supports `[from]` and `[to]`.
+
 Example File system `config.toml`:
 ```
 [from]
@@ -42,7 +44,7 @@ path = "$HOME/fits/to"
 ```
 
 ### Ftp
-At the moment you can only set ftp in `to` settings.
+Supports `[to]`.
 
 Example ftp `config.toml`:
 ```
@@ -51,6 +53,28 @@ path = "$HOME/fits/from"
 
 [to]
 path = "ftp://ftp.mydomain.com/to" or "ftp://192.168.1.100/to"
+username = "username"
+password = "password"
+```
+
+### Ssh
+Supports `[to]`.
+
+**Note!**
+Ssh will check for `known_hosts` in the running users `$HOME`-folder.
+Please add the host you are sending to in `~/.ssh/known_hosts`
+This can be done with:
+```
+ssh-keyscan -H 192.168.1.100 >> ~/.ssh/known_hosts
+```
+
+Example ssh `config.toml`:
+```
+[from]
+path = "$HOME/fits/from"
+
+[to]
+path = "ssh://mydomain.com/to" or "ssh://192.168.1.100/to"
 username = "username"
 password = "password"
 ```
