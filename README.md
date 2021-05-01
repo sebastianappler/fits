@@ -25,16 +25,16 @@ docker build . -t fits
 
 Run docker image with your `from` and `to` folders:
 ```
-docker run -v $HOME/fits/from:/from -v $HOME/fits/to:/to -it fits
+docker run -v $HOME/fits/from:/from -v $HOME/fits/to:/to -v /$HOME/code/fits/config:/config -it fits
 ```
 
 If you're using SSH you need specify the mount path for `known_hosts` to docker:
 ```
-docker run -v /$HOME/fits/from:/from -v /$HOME/.ssh:/.ssh -it fits
+docker run -v /$HOME/fits/from:/from -v /$HOME/.ssh:/.ssh -v /$HOME/code/fits/config:/config -it fits
 ```
 
 ## Config
-To use fits put a `from` and `to` destination in your `config.toml`
+To use fits put a `from` and `to` destination in your `config/config.toml`
 
 ### File system
 Supports `[from]` and `[to]`
@@ -72,7 +72,6 @@ This can be done with:
 ```
 ssh-keyscan -H 192.168.1.100 >> ~/.ssh/known_hosts
 ```
-  
 
 Example ssh `config.toml`
 ```

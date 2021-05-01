@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	config, err := toml.LoadFile("./config.toml")
+	config, err := toml.LoadFile("./config/config.toml")
 	if err != nil {
 		log.Fatal(err)
 	}
