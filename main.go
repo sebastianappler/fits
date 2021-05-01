@@ -46,6 +46,8 @@ func main() {
 		Username: config.GetDefault("from.username", "").(string),
 		Password: config.GetDefault("from.password", "").(string),
 	}
+	fmt.Println("FromPath:")
+	PrintPath(fromPath)
 
 	toPath := common.Path{
 		Url:      *toUrl,
@@ -53,6 +55,8 @@ func main() {
 		Username: config.GetDefault("to.username", "").(string),
 		Password: config.GetDefault("to.password", "").(string),
 	}
+	fmt.Println("ToPath:")
+	PrintPath(toPath)
 
 	err = watchers.FsWatch(fromPath, toPath)
 
@@ -75,4 +79,33 @@ func GetFullPath(path string) string {
 	}
 
 	return fullPath
+}
+
+func PrintPath(path common.Path) {
+
+	scheme := path.Url.Scheme
+	user := path.Username
+	host := path.Url.Host
+	port := path.Url.Port()
+	urlPath := path.Url.Path
+
+	if scheme == "" {
+		scheme = "fs"
+	}
+
+	fmt.Printf("scheme:%v\n", scheme)
+
+	if user != "" {
+		fmt.Printf("user:%v\n", path.Url.User)
+	}
+
+	if host != "" {
+		fmt.Printf("host:%v\n", host)
+	}
+
+	if port != "" {
+		fmt.Printf("port:%v\n", port)
+	}
+
+	fmt.Printf("path:%v\n", urlPath)
 }
