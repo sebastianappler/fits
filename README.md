@@ -28,6 +28,11 @@ Run docker image with your `from` and `to` folders:
 docker run -v $HOME/fits/from:/from -v $HOME/fits/to:/to -it fits
 ```
 
+If you're using SSH you need specify the mount path for `known_hosts` to docker:
+```
+docker run -v /$HOME/fits/from:/from -v /$HOME/.ssh:/.ssh -it fits
+```
+
 ## Config
 To use fits put a `from` and `to` destination in your `config.toml`
 
