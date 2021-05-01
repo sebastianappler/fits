@@ -10,7 +10,7 @@ func Send(fileLocalPath string, toPath common.Path) error {
 
 	scheme := toPath.Url.Scheme
 
-	if scheme == "fs" {
+	if scheme == "" {
 		err := FsSend(fileLocalPath, toPath)
 		if err != nil {
 			return fmt.Errorf("Unable to send file: %v", err)

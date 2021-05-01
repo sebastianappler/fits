@@ -67,5 +67,7 @@ func SshSend(fileLocalPath string, toPath common.Path) error {
 	if _, err := dstFile.ReadFrom(srcFile); err != nil {
 		return fmt.Errorf("unable to write file: %v", err)
 	}
+
+	fmt.Printf("File v% sent with ssh", fileLocalPath)
 	return nil
 }

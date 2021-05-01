@@ -85,6 +85,9 @@ func PrintPath(path common.Path) {
 
 	scheme := path.Url.Scheme
 	user := path.Username
+	if user == "" {
+		user = path.Url.User.Username()
+	}
 	host := path.Url.Host
 	port := path.Url.Port()
 	urlPath := path.Url.Path
@@ -96,7 +99,7 @@ func PrintPath(path common.Path) {
 	fmt.Printf("scheme:%v\n", scheme)
 
 	if user != "" {
-		fmt.Printf("user:%v\n", path.Url.User)
+		fmt.Printf("user:%v\n", user)
 	}
 
 	if host != "" {

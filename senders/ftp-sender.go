@@ -52,7 +52,7 @@ func FtpSend(fileLocalPath string, toPath common.Path) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("File %v uploaded to ftp!\n", filename)
+	fmt.Printf("File %v uploaded to ftp\n", filename)
 
 	return nil
 }

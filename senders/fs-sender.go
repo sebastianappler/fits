@@ -45,5 +45,6 @@ func FsSend(fileLocalPath string, toPath common.Path) error {
 		return fmt.Errorf("Chmod error: %s", err)
 	}
 
+	fmt.Printf("File %v sent\n", fileLocalPath)
 	return nil
 }
