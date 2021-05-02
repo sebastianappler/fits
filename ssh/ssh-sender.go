@@ -1,6 +1,7 @@
-package senders
+package ssh
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path"
@@ -12,7 +13,7 @@ import (
 	kh "golang.org/x/crypto/ssh/knownhosts"
 )
 
-func SshSend(fileLocalPath string, toPath common.Path) error {
+func Send(fileName string, fileData []byte, toPath common.Path) error {
 	port := toPath.Url.Port()
 	if port == "" {
 		port = "22"
@@ -20,13 +21,13 @@ func SshSend(fileLocalPath string, toPath common.Path) error {
 
 	file, err := os.Open(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
 	if err != nil {
-		return fmt.Errorf("unable to read known_hosts: %v", err)
+		return fmt.Errorf("unable to read known_hosts: %v\n", err)
 	}
 	defer file.Close()
 
 	hostKeyCallback, err := kh.New(filepath.Join(os.Getenv("HOME"), ".ssh", "known_hosts"))
 	if err != nil {
-		return fmt.Errorf("could not create hostkeycallback function: %v", err)
+		return fmt.Errorf("could not create hostkeycallback function: %v\n", err)
 	}
 
 	config := ssh.ClientConfig{
@@ -40,34 +41,30 @@ func SshSend(fileLocalPath string, toPath common.Path) error {
 	client, err := ssh.Dial("tcp", toPath.Url.Host+":"+port, &config)
 
 	if err != nil {
-		fmt.Errorf("Failed to dail: %v", err)
+		return fmt.Errorf("failed to dial: %v\n", err)
 	}
 
 	// open an SFTP session over an existing ssh connection.
 	sftp, err := sftp.NewClient(client)
 	if err != nil {
-		return fmt.Errorf("unable to create sftp client: %v", err)
+		return fmt.Errorf("unable to create sftp client: %v\n", err)
 	}
 	defer sftp.Close()
 
 	// Open the source file
-	srcFile, err := os.Open(fileLocalPath)
-	if err != nil {
-		return fmt.Errorf("unable to open source file: %v", err)
-	}
-	defer srcFile.Close()
+	srcFile := bytes.NewBuffer(fileData)
 
 	// Create the destination file
-	dstFile, err := sftp.Create(path.Join(toPath.Url.Path, filepath.Base(fileLocalPath)))
+	dstFile, err := sftp.Create(path.Join(toPath.Url.Path, fileName))
 	if err != nil {
-		return fmt.Errorf("unable to create destionation file: %v", err)
+		return fmt.Errorf("unable to create destionation file: %v\n", err)
 	}
 
 	// write to file
 	if _, err := dstFile.ReadFrom(srcFile); err != nil {
-		return fmt.Errorf("unable to write file: %v", err)
+		return fmt.Errorf("unable to write file: %v\n", err)
 	}
 
-	fmt.Printf("File v% sent with ssh", fileLocalPath)
+	fmt.Printf("file sent with ssh: %v\n", fileName)
 	return nil
 }

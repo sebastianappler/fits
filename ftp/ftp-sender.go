@@ -1,16 +1,15 @@
-package senders
+package ftp
 
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/jlaffaye/ftp"
 	"github.com/sebastianappler/fits/common"
 )
 
-func FtpSend(fileLocalPath string, toPath common.Path) error {
+func Send(fileName string, fileData []byte, toPath common.Path) error {
 
 	port := toPath.Url.Port()
 	if port == "" {
@@ -29,24 +28,17 @@ func FtpSend(fileLocalPath string, toPath common.Path) error {
 	}
 	fmt.Println("login success")
 
-	fmt.Printf("file full path: %v\n", fileLocalPath)
-	data, err := os.ReadFile(fileLocalPath)
-	if err != nil {
-		return fmt.Errorf("unable to read file: %v\n", err)
-	}
-
-	filename := filepath.Base(fileLocalPath)
-	ftpLocation := filepath.Join(toPath.Url.Path, filename)
+	ftpLocation := filepath.Join(toPath.Url.Path, fileName)
 	fmt.Printf("ftp location: %v\n", ftpLocation)
 
-	buf := bytes.NewBuffer(data)
+	buf := bytes.NewBuffer(fileData)
 	err = c.Stor(ftpLocation, buf)
 
 	if err := c.Quit(); err != nil {
 		return fmt.Errorf("error while transfering: %v\n", err)
 	}
 
-	fmt.Printf("file %v uploaded to ftp\n", filename)
+	fmt.Printf("file uploaded to ftp: %v\n", fileName)
 
 	return nil
 }

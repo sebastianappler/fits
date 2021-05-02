@@ -9,7 +9,7 @@ import (
 
 	"github.com/pelletier/go-toml"
 	"github.com/sebastianappler/fits/common"
-	"github.com/sebastianappler/fits/watchers"
+	"github.com/sebastianappler/fits/watcher"
 )
 
 func main() {
@@ -58,7 +58,7 @@ func main() {
 	fmt.Println("ToPath:")
 	PrintPath(toPath)
 
-	err = watchers.FsWatch(fromPath, toPath)
+	err = watcher.Watch(fromPath, toPath)
 
 	if err != nil {
 		log.Fatal(err)
