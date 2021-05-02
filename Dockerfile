@@ -9,6 +9,7 @@ RUN mkdir to
 RUN mkdir .ssh
 
 COPY . .
+RUN rm config/config.toml
 RUN go build -v -ldflags="-s -w"
 
 FROM scratch

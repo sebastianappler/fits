@@ -38,6 +38,16 @@ func main() {
 		if toUrl.Scheme == "" {
 			toUrlRaw = "/to"
 		}
+
+		if fromUrl.Scheme == "" {
+			fmt.Printf("setting docker from path: %v\n", fromUrlRaw)
+			fromUrl, _ = url.Parse(fromUrlRaw)
+		}
+
+		if toUrl.Scheme == "" {
+			fmt.Printf("setting docker to path: %v\n", toUrlRaw)
+			toUrl, _ = url.Parse(toUrlRaw)
+		}
 	}
 
 	fromPath := common.Path{
