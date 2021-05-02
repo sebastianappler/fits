@@ -3,8 +3,6 @@ package senders
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -20,39 +18,35 @@ func FtpSend(fileLocalPath string, toPath common.Path) error {
 	}
 
 	ftpBaseUrl := toPath.Url.Host + ":" + port
-	fmt.Printf("Connecting to ftp %v...\n", ftpBaseUrl)
+	fmt.Printf("connecting to ftp %v...\n", ftpBaseUrl)
 	c, err := ftp.Connect(ftpBaseUrl)
-	fmt.Println("Connected!")
+	fmt.Println("connected")
 
-	fmt.Println("Logging in...")
+	fmt.Println("logging in...")
 	err = c.Login(toPath.Username, toPath.Password)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("unable to login: %v\n", err)
 	}
-	fmt.Println("Login success!")
+	fmt.Println("login success")
 
-	fmt.Printf("File full path: %v\n", fileLocalPath)
-	file, err := os.Open(fileLocalPath)
+	fmt.Printf("file full path: %v\n", fileLocalPath)
+	data, err := os.ReadFile(fileLocalPath)
 	if err != nil {
-		log.Fatal(err)
-	}
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("unable to read file: %v\n", err)
 	}
 
 	filename := filepath.Base(fileLocalPath)
 	ftpLocation := filepath.Join(toPath.Url.Path, filename)
-	fmt.Printf("FtpLocation: %v\n", ftpLocation)
+	fmt.Printf("ftp location: %v\n", ftpLocation)
 
 	buf := bytes.NewBuffer(data)
 	err = c.Stor(ftpLocation, buf)
 
 	if err := c.Quit(); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("error while transfering: %v\n", err)
 	}
 
-	fmt.Printf("File %v uploaded to ftp\n", filename)
+	fmt.Printf("file %v uploaded to ftp\n", filename)
 
 	return nil
 }
