@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/sebastianappler/fits/common"
 )
@@ -19,8 +20,20 @@ func GetAllFileNames(path common.Path) ([]string, error) {
 
 	for _, file := range files {
 		if file.IsDir() != true {
-			fmt.Printf("found file %v\n", file.Name())
-			fileNames = append(fileNames, file.Name())
+			nowUtc := time.Now().UTC()
+			fileModTimeUtc := file.ModTime().UTC()
+
+			// Hack to prevent transfering of incomplete files.
+			// Can happen when files are created empty and writes
+			// are appended multiple times before the file is
+			// complete.
+			const backOffSeconds = 5
+			recentlyEdited := fileModTimeUtc.Add(time.Second * time.Duration(backOffSeconds)).After(nowUtc)
+			fmt.Printf("Recently edited, backing off: %v\n", recentlyEdited)
+
+			if recentlyEdited == false {
+				fileNames = append(fileNames, file.Name())
+			}
 		}
 	}
 
