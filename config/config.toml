@@ -1,5 +1,5 @@
 [from]
-path = "$HOME/fits/from"
+path = "/home/sebbe/fits/from"
 
 [to]
 path = "$HOME/fits/to"

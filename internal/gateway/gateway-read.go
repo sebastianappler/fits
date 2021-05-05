@@ -2,16 +2,17 @@ package gateway
 
 import (
 	"fmt"
+	"path/filepath"
 
-	"github.com/sebastianappler/fits/common"
-	"github.com/sebastianappler/fits/fs"
+	"github.com/sebastianappler/fits/internal/common"
+	"github.com/sebastianappler/fits/pkg/fs"
 )
 
 func GetAllFileNames(path common.Path) ([]string, error) {
 	scheme := path.Url.Scheme
 
 	if scheme == "" {
-		fileNames, err := fs.GetAllFileNames(path)
+		fileNames, err := fsGetAllFileNames(path)
 		if err != nil {
 			return nil, fmt.Errorf("unable get file names: %v\n", err)
 		}
@@ -33,7 +34,7 @@ func ReadFile(fileName string, path common.Path) ([]byte, error) {
 	scheme := path.Url.Scheme
 
 	if scheme == "" {
-		data, err := fs.ReadFile(fileName, path)
+		data, err := fsReadFile(fileName, path)
 		if err != nil {
 			return nil, fmt.Errorf("unable to send file: %v\n", err)
 		}
@@ -50,4 +51,12 @@ func ReadFile(fileName string, path common.Path) ([]byte, error) {
 	}
 
 	return nil, nil
+}
+
+func fsReadFile(fileName string, path common.Path) ([]byte, error) {
+	return fs.ReadFile(filepath.Join(path.Url.Path, fileName))
+}
+
+func fsGetAllFileNames(path common.Path) ([]string, error) {
+	return fs.GetAllFileNames(path.Url.Path)
 }

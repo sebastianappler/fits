@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
-	"github.com/sebastianappler/fits/common"
-	"github.com/sebastianappler/fits/gateway"
+	"github.com/sebastianappler/fits/internal/common"
+	"github.com/sebastianappler/fits/internal/gateway"
 )
 
 func Watch(fromPath common.Path, toPath common.Path) error {

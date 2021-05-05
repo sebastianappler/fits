@@ -3,18 +3,18 @@ package ssh
 import (
 	"bytes"
 	"fmt"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/pkg/sftp"
-	"github.com/sebastianappler/fits/common"
 	"golang.org/x/crypto/ssh"
 	kh "golang.org/x/crypto/ssh/knownhosts"
 )
 
-func Send(fileName string, fileData []byte, toPath common.Path) error {
-	port := toPath.Url.Port()
+func Send(fileName string, fileData []byte, url url.URL, username string, password string) error {
+	port := url.Port()
 	if port == "" {
 		port = "22"
 	}
@@ -31,14 +31,14 @@ func Send(fileName string, fileData []byte, toPath common.Path) error {
 	}
 
 	config := ssh.ClientConfig{
-		User: toPath.Username,
+		User: username,
 		Auth: []ssh.AuthMethod{
-			ssh.Password(toPath.Password),
+			ssh.Password(password),
 		},
 		HostKeyCallback: hostKeyCallback, // ssh.FixedHostKey(hostKey),
 	}
 
-	client, err := ssh.Dial("tcp", toPath.Url.Host+":"+port, &config)
+	client, err := ssh.Dial("tcp", url.Host+":"+port, &config)
 
 	if err != nil {
 		return fmt.Errorf("failed to dial: %v\n", err)
@@ -55,7 +55,7 @@ func Send(fileName string, fileData []byte, toPath common.Path) error {
 	srcFile := bytes.NewBuffer(fileData)
 
 	// Create the destination file
-	dstFile, err := sftp.Create(path.Join(toPath.Url.Path, fileName))
+	dstFile, err := sftp.Create(path.Join(url.Path, fileName))
 	if err != nil {
 		return fmt.Errorf("unable to create destionation file: %v\n", err)
 	}

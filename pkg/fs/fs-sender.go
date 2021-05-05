@@ -6,12 +6,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-
-	"github.com/sebastianappler/fits/common"
 )
 
-func Send(fileName string, fileData []byte, toPath common.Path) error {
-	to := filepath.Join(toPath.UrlRaw, fileName)
+func Send(fileName string, fileData []byte, path string) error {
+	to := filepath.Join(path, fileName)
 
 	out, err := os.Create(to)
 	if err != nil {
@@ -35,12 +33,11 @@ func Send(fileName string, fileData []byte, toPath common.Path) error {
 	return nil
 }
 
-func Remove(fileName string, path common.Path) error {
-	err := os.Remove(filepath.Join(path.Url.Path, fileName))
+func Remove(fileName string, path string) error {
+	err := os.Remove(filepath.Join(path, fileName))
 	if err != nil {
 		return fmt.Errorf("unable to remove file: %v\n", err)
 	}
 
 	return nil
-
 }

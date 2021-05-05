@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
-
-	"github.com/sebastianappler/fits/common"
 )
 
-func GetAllFileNames(path common.Path) ([]string, error) {
+func GetAllFileNames(path string) ([]string, error) {
 
-	files, err := ioutil.ReadDir(path.Url.Path)
+	files, err := ioutil.ReadDir(path)
 	fileNames := []string{}
 	if err != nil {
 		return nil, fmt.Errorf("unable to read files: %v\n", err)
@@ -40,13 +37,9 @@ func GetAllFileNames(path common.Path) ([]string, error) {
 	return fileNames, nil
 }
 
-func ReadFile(fileName string, path common.Path) ([]byte, error) {
-	return readFile(filepath.Join(path.Url.Path, fileName))
-}
-
-func readFile(filePath string) ([]byte, error) {
-	fmt.Printf("file full path: %v\n", filePath)
-	data, err := os.ReadFile(filePath)
+func ReadFile(fullPath string) ([]byte, error) {
+	fmt.Printf("file full path: %v\n", fullPath)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file: %v\n", err)
 	}

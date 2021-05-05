@@ -10,7 +10,7 @@ RUN mkdir .ssh
 
 COPY . .
 RUN rm config/config.toml
-RUN go build -v -ldflags="-s -w"
+RUN go build -v -ldflags="-s -w" ./cmd/fits
 
 FROM scratch
 ENV FITS_ENVIRONMENT=docker
