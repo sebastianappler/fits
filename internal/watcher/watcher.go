@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-co-op/gocron"
 	"github.com/sebastianappler/fits/internal/common"
-	"github.com/sebastianappler/fits/internal/gateway"
+	"github.com/sebastianappler/fits/internal/fileservice"
 )
 
 func Watch(fromPath common.Path, toPath common.Path) error {
@@ -16,32 +16,50 @@ func Watch(fromPath common.Path, toPath common.Path) error {
 
 	done := make(chan bool)
 	s := gocron.NewScheduler(time.Now().Location())
-	s.Every(10).Seconds().Do(SendAllFiles, fromPath, toPath)
+	s.Every(10).Seconds().Do(ProcessFiles, fromPath, toPath)
 	s.StartAsync()
 	<-done
 
 	return nil
 }
 
-func SendAllFiles(fromPath common.Path, toPath common.Path) {
-	fileNames, err := gateway.GetAllFileNames(fromPath)
+func ProcessFiles(fromPath common.Path, toPath common.Path) {
+	fromSvc := GetFileService(fromPath.Url.Scheme)
+	toSvc := GetFileService(toPath.Url.Scheme)
+
+	fileNames, err := fromSvc.List(fromPath)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, fileName := range fileNames {
 		fmt.Printf("processing file %v\n", fileName)
-		fileData, err := gateway.ReadFile(fileName, fromPath)
+		fileData, err := fromSvc.Read(fileName, fromPath)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			err = gateway.Send(fileName, fileData, toPath)
+			err = toSvc.Send(fileName, fileData, toPath)
 
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				gateway.Remove(fileName, fromPath)
+				fromSvc.Remove(fileName, fromPath)
 			}
 		}
 	}
+}
+
+func GetFileService(scheme string) fileservice.FileService {
+	if scheme == "" {
+		return fileservice.FsFileService{}
+	}
+	if scheme == "ftp" {
+		return fileservice.FtpFileService{}
+	}
+	if scheme == "ssh" {
+		return fileservice.SshFileService{}
+	}
+
+	return nil
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetAllFileNames(path string) ([]string, error) {
+func List(path string) ([]string, error) {
 
 	files, err := ioutil.ReadDir(path)
 	fileNames := []string{}
@@ -40,7 +40,7 @@ func GetAllFileNames(path string) ([]string, error) {
 	return fileNames, nil
 }
 
-func ReadFile(fullPath string) ([]byte, error) {
+func Read(fullPath string) ([]byte, error) {
 	fmt.Printf("file full path: %v\n", fullPath)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
