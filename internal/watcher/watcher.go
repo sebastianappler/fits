@@ -3,6 +3,7 @@ package watcher
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -24,8 +25,8 @@ func Watch(fromPath common.Path, toPath common.Path) error {
 }
 
 func ProcessFiles(fromPath common.Path, toPath common.Path) {
-	fromSvc := GetFileService(fromPath.Url.Scheme)
-	toSvc := GetFileService(toPath.Url.Scheme)
+	fromSvc := GetFileService(fromPath)
+	toSvc := GetFileService(toPath)
 
 	filenames, err := fromSvc.List(fromPath)
 
@@ -50,8 +51,17 @@ func ProcessFiles(fromPath common.Path, toPath common.Path) {
 	}
 }
 
-func GetFileService(scheme string) fileservice.FileService {
+func GetFileService(path common.Path) fileservice.FileService {
+	scheme := path.Url.Scheme
 	if scheme == "" {
+		if strings.HasPrefix(path.UrlRaw, "//") || strings.HasPrefix(path.UrlRaw, "\\\\") {
+			scheme = "smb"
+		} else {
+			scheme = "fs"
+		}
+	}
+
+	if scheme == "fs" {
 		return fileservice.FsFileService{}
 	}
 	if scheme == "ftp" {
@@ -60,6 +70,8 @@ func GetFileService(scheme string) fileservice.FileService {
 	if scheme == "ssh" {
 		return fileservice.SshFileService{}
 	}
-
+	if scheme == "smb" {
+		return fileservice.SmbFileService{}
+	}
 	return nil
 }

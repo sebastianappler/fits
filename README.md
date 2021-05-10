@@ -83,3 +83,17 @@ path = "ssh://mydomain.com/to" or "ssh://192.168.1.100/to"
 username = "username"
 password = "password"
 ```
+
+### SMB
+Supports `[to]`
+
+Example ftp `config.toml`
+```
+[from]
+path = "$HOME/fits/from"
+
+[to]
+path = "smb://192.168.1.100/to" or "//192.168.1.100/to"
+username = "username"
+password = "password"
+```

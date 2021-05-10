@@ -38,7 +38,7 @@ func Send(filename string, data []byte, url url.URL, username string, password s
 		HostKeyCallback: hostKeyCallback, // ssh.FixedHostKey(hostKey),
 	}
 
-	client, err := ssh.Dial("tcp", url.Host+":"+port, &config)
+	client, err := ssh.Dial("tcp", url.Hostname()+":"+port, &config)
 
 	if err != nil {
 		return fmt.Errorf("failed to dial: %v\n", err)
@@ -51,16 +51,13 @@ func Send(filename string, data []byte, url url.URL, username string, password s
 	}
 	defer sftp.Close()
 
-	// Open the source file
 	srcFile := bytes.NewBuffer(data)
 
-	// Create the destination file
 	dstFile, err := sftp.Create(path.Join(url.Path, filename))
 	if err != nil {
 		return fmt.Errorf("unable to create destionation file: %v\n", err)
 	}
 
-	// write to file
 	if _, err := dstFile.ReadFrom(srcFile); err != nil {
 		return fmt.Errorf("unable to write file: %v\n", err)
 	}

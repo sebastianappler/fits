@@ -16,7 +16,7 @@ func (FtpFileService) Read(filename string, path common.Path) ([]byte, error) {
 }
 
 func (FtpFileService) Send(filename string, data []byte, path common.Path) error {
-	return ftp.Send(filename, data, path.Url, path.Password, path.Username)
+	return ftp.Send(filename, data, path.Url, path.Username, path.Password)
 }
 
 func (FtpFileService) Remove(filename string, path common.Path) error {

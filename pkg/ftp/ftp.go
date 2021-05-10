@@ -16,7 +16,7 @@ func Send(filename string, data []byte, url url.URL, username string, password s
 		port = "21"
 	}
 
-	ftpBaseUrl := url.Host + ":" + port
+	ftpBaseUrl := url.Hostname() + ":" + port
 	fmt.Printf("connecting to ftp %v...\n", ftpBaseUrl)
 	c, err := ftp.Connect(ftpBaseUrl)
 	fmt.Println("connected")

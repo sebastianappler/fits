@@ -55,7 +55,7 @@ func Send(filename string, data []byte, path string) error {
 
 	out, err := os.Create(to)
 	if err != nil {
-		return fmt.Errorf("couldn't open dest file: %v\n", err)
+		return fmt.Errorf("unable to open file on filesystem: %v\n", err)
 	}
 
 	defer out.Close()

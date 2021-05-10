@@ -16,7 +16,7 @@ func (SshFileService) Read(filename string, path common.Path) ([]byte, error) {
 }
 
 func (SshFileService) Send(filename string, data []byte, path common.Path) error {
-	return ssh.Send(filename, data, path.Url, path.Password, path.Username)
+	return ssh.Send(filename, data, path.Url, path.Username, path.Password)
 }
 
 func (SshFileService) Remove(filename string, path common.Path) error {

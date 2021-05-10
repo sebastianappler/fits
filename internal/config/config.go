@@ -71,7 +71,9 @@ func LoadConfig() (common.Path, common.Path) {
 }
 
 func getFullPath(path string) string {
+	path = strings.Replace(path, "\\", "/", -1)
 	strArr := strings.Split(path, "/")
+
 	fullPath := ""
 	for _, str := range strArr {
 		if str == "" {
@@ -98,7 +100,11 @@ func printPath(path common.Path) {
 	urlPath := path.Url.Path
 
 	if scheme == "" {
-		scheme = "fs"
+		if strings.HasPrefix(path.UrlRaw, "//") || strings.HasPrefix(path.UrlRaw, "\\\\") {
+			scheme = "smb"
+		} else {
+			scheme = "fs"
+		}
 	}
 
 	fmt.Printf("scheme:%v\n", scheme)
