@@ -50,8 +50,8 @@ func Read(fullPath string) ([]byte, error) {
 	return data, nil
 }
 
-func Send(fileName string, fileData []byte, path string) error {
-	to := filepath.Join(path, fileName)
+func Send(filename string, data []byte, path string) error {
+	to := filepath.Join(path, filename)
 
 	out, err := os.Create(to)
 	if err != nil {
@@ -60,7 +60,7 @@ func Send(fileName string, fileData []byte, path string) error {
 
 	defer out.Close()
 
-	reader := bytes.NewReader(fileData)
+	reader := bytes.NewReader(data)
 	_, err = io.Copy(out, reader)
 	if err != nil {
 		return fmt.Errorf("writing to output file failed: %v\n", err)
@@ -71,12 +71,12 @@ func Send(fileName string, fileData []byte, path string) error {
 		return fmt.Errorf("Sync error: %v\n", err)
 	}
 
-	fmt.Printf("file sent: %v\n", fileName)
+	fmt.Printf("file sent: %v\n", filename)
 	return nil
 }
 
-func Remove(fileName string, path string) error {
-	err := os.Remove(filepath.Join(path, fileName))
+func Remove(filename string, path string) error {
+	err := os.Remove(filepath.Join(path, filename))
 	if err != nil {
 		return fmt.Errorf("unable to remove file: %v\n", err)
 	}

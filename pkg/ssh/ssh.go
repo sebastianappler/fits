@@ -13,7 +13,7 @@ import (
 	kh "golang.org/x/crypto/ssh/knownhosts"
 )
 
-func Send(fileName string, fileData []byte, url url.URL, username string, password string) error {
+func Send(filename string, data []byte, url url.URL, username string, password string) error {
 	port := url.Port()
 	if port == "" {
 		port = "22"
@@ -52,10 +52,10 @@ func Send(fileName string, fileData []byte, url url.URL, username string, passwo
 	defer sftp.Close()
 
 	// Open the source file
-	srcFile := bytes.NewBuffer(fileData)
+	srcFile := bytes.NewBuffer(data)
 
 	// Create the destination file
-	dstFile, err := sftp.Create(path.Join(url.Path, fileName))
+	dstFile, err := sftp.Create(path.Join(url.Path, filename))
 	if err != nil {
 		return fmt.Errorf("unable to create destionation file: %v\n", err)
 	}
@@ -65,6 +65,6 @@ func Send(fileName string, fileData []byte, url url.URL, username string, passwo
 		return fmt.Errorf("unable to write file: %v\n", err)
 	}
 
-	fmt.Printf("file sent with ssh: %v\n", fileName)
+	fmt.Printf("file sent with ssh: %v\n", filename)
 	return nil
 }

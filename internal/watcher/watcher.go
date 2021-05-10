@@ -27,24 +27,24 @@ func ProcessFiles(fromPath common.Path, toPath common.Path) {
 	fromSvc := GetFileService(fromPath.Url.Scheme)
 	toSvc := GetFileService(toPath.Url.Scheme)
 
-	fileNames, err := fromSvc.List(fromPath)
+	filenames, err := fromSvc.List(fromPath)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, fileName := range fileNames {
-		fmt.Printf("processing file %v\n", fileName)
-		fileData, err := fromSvc.Read(fileName, fromPath)
+	for _, filename := range filenames {
+		fmt.Printf("processing file %v\n", filename)
+		data, err := fromSvc.Read(filename, fromPath)
 		if err != nil {
 			log.Fatal(err)
 		} else {
-			err = toSvc.Send(fileName, fileData, toPath)
+			err = toSvc.Send(filename, data, toPath)
 
 			if err != nil {
 				log.Fatal(err)
 			} else {
-				fromSvc.Remove(fileName, fromPath)
+				fromSvc.Remove(filename, fromPath)
 			}
 		}
 	}

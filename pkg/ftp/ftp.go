@@ -9,7 +9,7 @@ import (
 	"github.com/jlaffaye/ftp"
 )
 
-func Send(fileName string, fileData []byte, url url.URL, username string, password string) error {
+func Send(filename string, data []byte, url url.URL, username string, password string) error {
 
 	port := url.Port()
 	if port == "" {
@@ -28,17 +28,17 @@ func Send(fileName string, fileData []byte, url url.URL, username string, passwo
 	}
 	fmt.Println("login success")
 
-	ftpLocation := filepath.Join(url.Path, fileName)
+	ftpLocation := filepath.Join(url.Path, filename)
 	fmt.Printf("ftp location: %v\n", ftpLocation)
 
-	buf := bytes.NewBuffer(fileData)
+	buf := bytes.NewBuffer(data)
 	err = c.Stor(ftpLocation, buf)
 
 	if err := c.Quit(); err != nil {
 		return fmt.Errorf("error while transfering: %v\n", err)
 	}
 
-	fmt.Printf("file uploaded to ftp: %v\n", fileName)
+	fmt.Printf("file uploaded to ftp: %v\n", filename)
 
 	return nil
 }
