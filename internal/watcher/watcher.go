@@ -3,11 +3,11 @@ package watcher
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/go-co-op/gocron"
 	"github.com/sebastianappler/fits/internal/common"
+	"github.com/sebastianappler/fits/internal/config"
 	"github.com/sebastianappler/fits/internal/fileservice"
 )
 
@@ -54,11 +54,7 @@ func processFiles(fromPath common.Path, toPath common.Path) {
 func getFileService(path common.Path) fileservice.FileService {
 	scheme := path.Url.Scheme
 	if scheme == "" {
-		if strings.HasPrefix(path.UrlRaw, "//") {
-			scheme = "smb"
-		} else {
-			scheme = "fs"
-		}
+		scheme = config.GetSchemeByUrl(path.UrlRaw)
 	}
 
 	if scheme == "fs" {

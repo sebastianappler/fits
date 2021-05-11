@@ -19,7 +19,10 @@ func LoadConfig() (common.Path, common.Path) {
 	fmt.Println("Config loaded successfully.")
 
 	fromUrlRaw := getFullPath(config.Get("from.path").(string))
+	fromUrlRaw = strings.Replace(fromUrlRaw, "\\", "/", -1)
 	toUrlRaw := getFullPath(config.Get("to.path").(string))
+	toUrlRaw = strings.Replace(toUrlRaw, "\\", "/", -1)
+
 	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
 	fromUrl, err := url.Parse(fromUrlRaw)
 	if err != nil {
@@ -32,19 +35,15 @@ func LoadConfig() (common.Path, common.Path) {
 
 	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
 	if fitsEnvironment == "docker" {
-		fromUrlRaw = "/from"
-
-		if toUrl.Scheme == "" {
-			toUrlRaw = "/to"
-		}
-
-		if fromUrl.Scheme == "" {
-			fmt.Printf("setting docker from path: %v\n", fromUrlRaw)
+		if fromUrl.Scheme == "" && GetSchemeByUrl(fromUrlRaw) == "fs" {
+			fromUrlRaw = "/from"
+			fmt.Printf("setting docker fromPath: %v\n", fromUrlRaw)
 			fromUrl, _ = url.Parse(fromUrlRaw)
 		}
 
-		if toUrl.Scheme == "" {
-			fmt.Printf("setting docker to path: %v\n", toUrlRaw)
+		if toUrl.Scheme == "" && GetSchemeByUrl(toUrlRaw) == "fs" {
+			toUrlRaw = "/to"
+			fmt.Printf("setting docker toPath: %v\n", toUrlRaw)
 			toUrl, _ = url.Parse(toUrlRaw)
 		}
 	}
@@ -70,8 +69,14 @@ func LoadConfig() (common.Path, common.Path) {
 	return fromPath, toPath
 }
 
+func GetSchemeByUrl(url string) string {
+	if strings.HasPrefix(url, "//") {
+		return "smb"
+	}
+	return "fs"
+}
+
 func getFullPath(path string) string {
-	path = strings.Replace(path, "\\", "/", -1)
 	strArr := strings.Split(path, "/")
 
 	fullPath := ""
@@ -89,7 +94,6 @@ func getFullPath(path string) string {
 }
 
 func printPath(path common.Path) {
-
 	scheme := path.Url.Scheme
 	user := path.Username
 	if user == "" {
@@ -100,11 +104,7 @@ func printPath(path common.Path) {
 	urlPath := path.Url.Path
 
 	if scheme == "" {
-		if strings.HasPrefix(path.UrlRaw, "//") || strings.HasPrefix(path.UrlRaw, "\\\\") {
-			scheme = "smb"
-		} else {
-			scheme = "fs"
-		}
+		scheme = GetSchemeByUrl(path.UrlRaw)
 	}
 
 	fmt.Printf("scheme:%v\n", scheme)
