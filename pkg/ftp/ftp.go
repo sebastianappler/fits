@@ -10,7 +10,6 @@ import (
 )
 
 func Send(filename string, data []byte, url url.URL, username string, password string) error {
-
 	port := url.Port()
 	if port == "" {
 		port = "21"
@@ -39,6 +38,5 @@ func Send(filename string, data []byte, url url.URL, username string, password s
 	}
 
 	fmt.Printf("file uploaded to ftp: %v\n", filename)
-
 	return nil
 }

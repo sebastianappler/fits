@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	fromPath, toPath := config.LoadConfig()
 	err := watcher.Watch(fromPath, toPath)
 

@@ -17,16 +17,16 @@ func Watch(fromPath common.Path, toPath common.Path) error {
 
 	done := make(chan bool)
 	s := gocron.NewScheduler(time.Now().Location())
-	s.Every(10).Seconds().Do(ProcessFiles, fromPath, toPath)
+	s.Every(10).Seconds().Do(processFiles, fromPath, toPath)
 	s.StartAsync()
 	<-done
 
 	return nil
 }
 
-func ProcessFiles(fromPath common.Path, toPath common.Path) {
-	fromSvc := GetFileService(fromPath)
-	toSvc := GetFileService(toPath)
+func processFiles(fromPath common.Path, toPath common.Path) {
+	fromSvc := getFileService(fromPath)
+	toSvc := getFileService(toPath)
 
 	filenames, err := fromSvc.List(fromPath)
 
@@ -51,10 +51,10 @@ func ProcessFiles(fromPath common.Path, toPath common.Path) {
 	}
 }
 
-func GetFileService(path common.Path) fileservice.FileService {
+func getFileService(path common.Path) fileservice.FileService {
 	scheme := path.Url.Scheme
 	if scheme == "" {
-		if strings.HasPrefix(path.UrlRaw, "//") || strings.HasPrefix(path.UrlRaw, "\\\\") {
+		if strings.HasPrefix(path.UrlRaw, "//") {
 			scheme = "smb"
 		} else {
 			scheme = "fs"
@@ -73,5 +73,6 @@ func GetFileService(path common.Path) fileservice.FileService {
 	if scheme == "smb" {
 		return fileservice.SmbFileService{}
 	}
+
 	return nil
 }

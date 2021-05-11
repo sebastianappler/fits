@@ -11,7 +11,6 @@ import (
 )
 
 func List(path string) ([]string, error) {
-
 	files, err := ioutil.ReadDir(path)
 	fileNames := []string{}
 	if err != nil {
@@ -29,9 +28,9 @@ func List(path string) ([]string, error) {
 			// complete.
 			const backOffSeconds = 5
 			recentlyEdited := fileModTimeUtc.Add(time.Second * time.Duration(backOffSeconds)).After(nowUtc)
-			fmt.Printf("Recently edited, backing off: %v\n", recentlyEdited)
 
 			if recentlyEdited == false {
+				fmt.Println("Recently edited, backing off")
 				fileNames = append(fileNames, file.Name())
 			}
 		}
