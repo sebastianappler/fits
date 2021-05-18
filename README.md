@@ -1,6 +1,18 @@
 # fits
 Fits is a **fi**le **t**ransfer **s**ervice written in go.
 
+## Why?
+I just want a service that watch a folder and move added files files from a A to B. No more no less, just make one task and make it good.
+
+Examples:
+- Your NAS only offers you bloaty and payed enterprise apps for backing up files. Set up a cronjob to generate a backup on your server on and use fits to transfer them to your NAS via FTP/SMB.
+
+- Your company gets files uploaded to a folder and they need to be moved somewhere for processing. Just set up a fits and let it  transfer the new files.
+
+- You run a kubernetes cluster and want a service that can run as a pod and move files between FTP/SMB/SSH to FTP/SMB/SSH.
+
+- You generate blog posts on your local machine and you want them to automatically be uploaded to your website. Use fits to automatically take files from your system and SSH them to your server.
+
 ## Usage
 When you start fits it will transfer files between your `from` and `to` from your config.
 Make sure to set the paths correctly before running fits. Check the [Config](#config) section how to edit it.
