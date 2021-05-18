@@ -8,7 +8,7 @@ import (
 type FtpFileService struct{}
 
 func (FtpFileService) List(path common.Path) ([]string, error) {
-	return nil, nil //ftp.List(path.UrlRaw)
+	return ftp.List(path.Url.Path, path.Url, path.Username, path.Password)
 }
 
 func (FtpFileService) Read(filename string, path common.Path) ([]byte, error) {
