@@ -25,29 +25,36 @@ func Watch(fromPath common.Path, toPath common.Path) error {
 }
 
 func processFiles(fromPath common.Path, toPath common.Path) {
+	defer handleFileProcessPanic()
 	fromSvc := getFileService(fromPath)
 	toSvc := getFileService(toPath)
 
 	filenames, err := fromSvc.List(fromPath)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	for _, filename := range filenames {
 		fmt.Printf("processing file %v\n", filename)
 		data, err := fromSvc.Read(filename, fromPath)
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		} else {
 			err = toSvc.Send(filename, data, toPath)
 
 			if err != nil {
-				log.Fatal(err)
+				log.Panic(err)
 			} else {
 				fromSvc.Remove(filename, fromPath)
 			}
 		}
+	}
+}
+
+func handleFileProcessPanic() {
+	if a := recover(); a != nil {
+		fmt.Println("recover from panic while processed file.", a)
 	}
 }
 
