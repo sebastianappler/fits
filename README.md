@@ -2,7 +2,7 @@
 Fits is a **fi**le **t**ransfer **s**ervice written in go.
 
 ## Why?
-I just want a service that watch a folder and move added files files from a A to B. No more no less, just make one task and make it good.
+I want a simple service to watch a folder and move new files from a A to B.
 
 Examples:
 - Your NAS only offers you bloaty and payed enterprise apps for backing up files. Set up a cronjob to generate a backup on your server on and use fits to transfer them to your NAS via FTP/SMB.
