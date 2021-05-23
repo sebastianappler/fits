@@ -18,6 +18,7 @@ func Watch(fromPath common.Path, toPath common.Path) error {
 	done := make(chan bool)
 	s := gocron.NewScheduler(time.Now().Location())
 	s.Every(10).Seconds().Do(processFiles, fromPath, toPath)
+	s.SingletonMode()
 	s.StartAsync()
 	<-done
 
