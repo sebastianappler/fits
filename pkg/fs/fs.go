@@ -70,7 +70,6 @@ func Send(filename string, data []byte, path string) error {
 		return fmt.Errorf("Sync error: %v\n", err)
 	}
 
-	fmt.Printf("file sent: %v\n", filename)
 	return nil
 }
 

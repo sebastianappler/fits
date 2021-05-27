@@ -20,5 +20,5 @@ func (FtpFileService) Send(filename string, data []byte, path common.Path) error
 }
 
 func (FtpFileService) Remove(filename string, path common.Path) error {
-	return nil //ftp.Remove(fileName, path.UrlRaw)
+	return ftp.Remove(filename, path.Url, path.Username, path.Password)
 }
