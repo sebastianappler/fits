@@ -12,7 +12,7 @@ func (FtpFileService) List(path common.Path) ([]string, error) {
 }
 
 func (FtpFileService) Read(filename string, path common.Path) ([]byte, error) {
-	return nil, nil //ftp.Read(filepath.Join(path.Url.Path, fileName))
+	return ftp.Read(filename, path.Url, path.Username, path.Password)
 }
 
 func (FtpFileService) Send(filename string, data []byte, path common.Path) error {

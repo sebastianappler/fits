@@ -37,7 +37,6 @@ func processFiles(fromPath common.Path, toPath common.Path) {
 	}
 
 	for _, filename := range filenames {
-		fmt.Printf("processing file %v\n", filename)
 		data, err := fromSvc.Read(filename, fromPath)
 		if err != nil {
 			log.Panic(err)
@@ -48,6 +47,9 @@ func processFiles(fromPath common.Path, toPath common.Path) {
 				log.Panic(err)
 			} else {
 				fromSvc.Remove(filename, fromPath)
+
+				// Print transfered file
+				fmt.Println(filename)
 			}
 		}
 	}

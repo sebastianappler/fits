@@ -3,6 +3,7 @@ package ftp
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"path/filepath"
 
@@ -66,4 +67,16 @@ func List(path string, url url.URL, username string, password string) ([]string,
 	}
 
 	return filenames, nil
+}
+
+func Read(filename string, url url.URL, username string, password string) ([]byte, error) {
+	c, err := connect(url, username, password)
+	r, err := c.Retr(filename)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read file: %v\n", err)
+	}
+	defer r.Close()
+
+	buf, err := ioutil.ReadAll(r)
+	return buf, nil
 }
