@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"path/filepath"
+	"time"
 
 	"github.com/jlaffaye/ftp"
 )
@@ -56,9 +57,21 @@ func List(path string, url url.URL, username string, password string) ([]string,
 
 	filenames := []string{}
 	for _, file := range files {
-
 		if file.Type == ftp.EntryTypeFile {
-			filenames = append(filenames, file.Name)
+
+			nowUtc := time.Now().UTC()
+			fileModTimeUtc := file.Time.UTC()
+
+			// Hack to prevent transfering of incomplete files.
+			// Can happen when files are created empty and writes
+			// are appended multiple times before the file is
+			// complete.
+			const backOffSeconds = 10
+			recentlyEdited := fileModTimeUtc.Add(time.Second * time.Duration(backOffSeconds)).After(nowUtc)
+
+			if recentlyEdited == false {
+				filenames = append(filenames, file.Name)
+			}
 		}
 	}
 

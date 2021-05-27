@@ -30,7 +30,6 @@ func List(path string) ([]string, error) {
 			recentlyEdited := fileModTimeUtc.Add(time.Second * time.Duration(backOffSeconds)).After(nowUtc)
 
 			if recentlyEdited == false {
-				fmt.Println("Recently edited, backing off")
 				fileNames = append(fileNames, file.Name())
 			}
 		}
