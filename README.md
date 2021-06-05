@@ -61,7 +61,7 @@ path = "$HOME/fits/to"
 ```
 
 ### FTP
-Supports `[to]`
+Supports `[from]` and `[to]`
 
 Example ftp `config.toml`
 ```
