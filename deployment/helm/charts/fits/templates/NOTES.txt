@@ -1,0 +1,3 @@
+Your fits instance is being deployed!
+
+When ready fits will start to transfer files from "{{ .Values.fits.from.path }}" to "{{ .Values.fits.to.path }}".

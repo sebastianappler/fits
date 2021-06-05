@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fits.fullname" . }}
+  labels:
+    {{- include "fits.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "fits.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fits.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          volumeMounts:
+          {{- if .Values.fits.mountConfig }}
+          - mountPath: /config
+            name: config
+          {{- end }}
+          {{- if eq (substr 0 1 .Values.fits.from.path) "/" }}
+          - mountPath: /from
+            name: from
+          {{- end}}
+          {{- if eq (substr 0 1 .Values.fits.to.path) "/" }}
+          - mountPath: /to
+            name: to
+          {{- end}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: FITS_FROM_PATH
+            value: {{ .Values.fits.from.path }}
+          {{- if .Values.fits.from.secret }}
+          - name: FITS_FROM_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.fits.from.secretName }}
+                key: {{ .Values.fits.from.secretKeyUsername }}
+          - name: FITS_FROM_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.fits.from.secretName }}
+                key: {{ .Values.fits.from.secretKeyPassword }}
+          {{- else }}
+          - name: FITS_FROM_USERNAME
+            value: {{ .Values.fits.from.username }}
+          - name: FITS_FROM_PASSWORD
+            value: {{ .Values.fits.from.password }}
+          {{- end }}
+          - name: FITS_TO_PATH
+            value: {{ .Values.fits.to.path }}
+          {{- if .Values.fits.to.secret }}
+          - name: FITS_TO_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.fits.to.secretName }}
+                key: {{ .Values.fits.to.secretKeyUsername }}
+          - name: FITS_TO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.fits.to.secretName }}
+                key: {{ .Values.fits.to.secretKeyPassword }}
+          {{- else }}
+          - name: FITS_TO_USERNAME
+            value: {{ .Values.fits.to.username }}
+          - name: FITS_TO_PASSWORD
+            value: {{ .Values.fits.to.password }}
+          {{- end }}
+      volumes:
+      {{- if .Values.fits.mountConfig }}
+      - name: config
+        hostPath:
+          path: {{ .Values.fits.mountConfigPath }}
+          type: DirectoryOrCreate
+      {{- end }}
+      {{- if eq (substr 0 1 .Values.fits.from.path) "/" }}
+      - name: from
+        hostPath:
+          path: {{ .Values.fits.from.path }}
+          type: DirectoryOrCreate
+      {{- end }}
+      {{- if eq (substr 0 1 .Values.fits.to.path) "/" }}
+      - name: to
+        hostPath:
+          path: {{ .Values.fits.to.path }}
+          type: DirectoryOrCreate
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
