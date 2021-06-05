@@ -35,7 +35,7 @@ image:
   repository: sebastianappler/fits
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.12-beta"
+  tag: "0.0.13-beta"
 
 extraVolumeMounts: []
 
