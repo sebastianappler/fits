@@ -12,7 +12,7 @@ COPY . .
 RUN rm config/config.toml
 RUN go build -v -ldflags="-s -w" ./cmd/fits
 
-FROM scratch
+FROM alpine:latest
 ENV FITS_ENVIRONMENT=docker
 
 COPY --from=builder /build/fits build/config build/from build/.ssh build/to /
