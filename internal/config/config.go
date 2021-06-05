@@ -12,64 +12,73 @@ import (
 )
 
 func LoadConfig() (common.Path, common.Path) {
-	config, err := toml.LoadFile("./config/config.toml")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Config loaded successfully.")
-
-	fromUrlRaw := getFullPath(config.Get("from.path").(string))
-	fromUrlRaw = strings.Replace(fromUrlRaw, "\\", "/", -1)
-	toUrlRaw := getFullPath(config.Get("to.path").(string))
-	toUrlRaw = strings.Replace(toUrlRaw, "\\", "/", -1)
-
+	var fromPathRaw, fromUsername, fromPassword, toPathRaw, toUsername, toPassword string
+	config, loadConfigFileErr := toml.LoadFile("./config/config.toml")
 	fitsEnvironment := os.Getenv("FITS_ENVIRONMENT")
-	fromUrl, err := url.Parse(fromUrlRaw)
-	if err != nil {
-		log.Fatal(err)
-	}
-	toUrl, err := url.Parse(toUrlRaw)
-	if err != nil {
-		log.Fatal(err)
-	}
+	fmt.Printf("environment: %v\n", fitsEnvironment)
+	// Let config file have precedence over env variables
+	if loadConfigFileErr == nil {
+		fromPathRaw = config.Get("from.path").(string)
+		fromUsername = config.GetDefault("from.username", "").(string)
+		fromPassword = config.GetDefault("from.password", "").(string)
+		toPathRaw = config.Get("to.path").(string)
+		toUsername = config.GetDefault("to.username", "").(string)
+		toPassword = config.GetDefault("to.password", "").(string)
+	} else {
+		fromPathRaw = os.Getenv("FITS_FROM_PATH")
+		fromUsername = os.Getenv("FITS_FROM_USERNAME")
+		fromPassword = os.Getenv("FITS_FROM_PASSWORD")
+		toPathRaw = os.Getenv("FITS_TO_PATH")
+		toUsername = os.Getenv("FITS_TO_USERNAME")
+		toPassword = os.Getenv("FITS_TO_PASSWORD")
 
-	fmt.Printf("ENVIRONMENT: %#v\n", fitsEnvironment)
-	if fitsEnvironment == "docker" {
-		if fromUrl.Scheme == "" && GetSchemeByUrl(fromUrlRaw) == "fs" {
-			fromUrlRaw = "/from"
-			fmt.Printf("setting docker fromPath: %v\n", fromUrlRaw)
-			fromUrl, _ = url.Parse(fromUrlRaw)
+		if(fromPathRaw == "" || toPathRaw == "") {
+			fmt.Printf("error loading config file: %v\n", loadConfigFileErr)
+			log.Fatal("no config file or environment variables found. Please verify that you have a config.toml file or environment variables FITS_FROM_PATH and FITS_TO_PATH set correctly.")
 		}
+	}
 
-		if toUrl.Scheme == "" && GetSchemeByUrl(toUrlRaw) == "fs" {
-			toUrlRaw = "/to"
-			fmt.Printf("setting docker toPath: %v\n", toUrlRaw)
-			toUrl, _ = url.Parse(toUrlRaw)
+	// If docker env we need to override the fs paths for container
+	if(fitsEnvironment == "docker") {
+		if(GetSchemeByUrl(fromPathRaw) == "fs") {
+			fromPathRaw = "/from"
+		}
+		if(GetSchemeByUrl(toPathRaw) == "fs") {
+			toPathRaw = "/to"
 		}
 	}
 
-	fromPath := common.Path{
-		Url:      *fromUrl,
-		UrlRaw:   fromUrlRaw,
-		Username: config.GetDefault("from.username", "").(string),
-		Password: config.GetDefault("from.password", "").(string),
-	}
-	fmt.Println("FromPath:")
+	fromPath := getPathObj(fromPathRaw, fromUsername, fromPassword)
+	fmt.Println("from info:")
 	printPath(fromPath)
 
-	toPath := common.Path{
-		Url:      *toUrl,
-		UrlRaw:   toUrlRaw,
-		Username: config.GetDefault("to.username", "").(string),
-		Password: config.GetDefault("to.password", "").(string),
-	}
-	fmt.Println("ToPath:")
+	toPath := getPathObj(toPathRaw, toUsername, toPassword)
+	fmt.Println("to info:")
 	printPath(toPath)
 
 	return fromPath, toPath
 }
 
-func GetSchemeByUrl(url string) string {
+func getPathObj(fromRaw, username, password string) (common.Path) {
+	urlRaw := getFullPath(fromRaw)
+	urlRaw = strings.Replace(urlRaw, "\\", "/", -1)
+	urlParsed, err := url.Parse(urlRaw)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	path := common.Path{
+		Url:      *urlParsed,
+		UrlRaw:   urlRaw,
+		Username: username,
+		Password: password,
+	}
+
+	return path
+}
+
+func GetSchemeByUrl(urlRaw string) string {
+	url := strings.Replace(urlRaw, "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		return "smb"
 	}
