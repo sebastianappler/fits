@@ -78,6 +78,14 @@ func getPathObj(fromRaw, username, password string) (common.Path) {
 }
 
 func GetSchemeByUrl(urlRaw string) string {
+	urlParsed, err := url.Parse(urlRaw)
+	if (err != nil) {
+		log.Fatal(err)
+	}
+	if(urlParsed.Scheme != "") {
+		return urlParsed.Scheme
+	}
+
 	url := strings.Replace(urlRaw, "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		return "smb"
