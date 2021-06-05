@@ -66,7 +66,9 @@ Supports `[from]` and `[to]`
 Example ftp `config.toml`
 ```
 [from]
-path = "$HOME/fits/from"
+path = "ftp://ftp.mydomain.com/to" or "ftp://192.168.1.100/to"
+username = "username"
+password = "password"
 
 [to]
 path = "ftp://ftp.mydomain.com/to" or "ftp://192.168.1.100/to"
