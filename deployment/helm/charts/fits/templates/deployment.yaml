@@ -25,11 +25,11 @@ spec:
           - mountPath: /config
             name: config
           {{- end }}
-          {{- if eq (substr 0 1 .Values.fits.from.path) "/" }}
+          {{- if and (eq (substr 0 1 .Values.fits.from.path) "/") (ne (substr 1 2 .Values.fits.from.path) "/") }}
           - mountPath: /from
             name: from
-          {{- end}}
-          {{- if eq (substr 0 1 .Values.fits.to.path) "/" }}
+          {{- end }}
+          {{- if and (eq (substr 0 1 .Values.fits.to.path) "/") (ne (substr 1 2 .Values.fits.to.path) "/") }}
           - mountPath: /to
             name: to
           {{- end}}
@@ -82,13 +82,13 @@ spec:
           path: {{ .Values.fits.mountConfigPath }}
           type: DirectoryOrCreate
       {{- end }}
-      {{- if eq (substr 0 1 .Values.fits.from.path) "/" }}
+      {{- if and (eq (substr 0 1 .Values.fits.from.path) "/") (ne (substr 1 2 .Values.fits.from.path) "/") }}
       - name: from
         hostPath:
           path: {{ .Values.fits.from.path }}
           type: DirectoryOrCreate
       {{- end }}
-      {{- if eq (substr 0 1 .Values.fits.to.path) "/" }}
+      {{- if and (eq (substr 0 1 .Values.fits.to.path) "/") (ne (substr 1 2 .Values.fits.to.path) "/") }}
       - name: to
         hostPath:
           path: {{ .Values.fits.to.path }}
